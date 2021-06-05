@@ -1,6 +1,7 @@
 using ArcadeTerraria.Games.Game_of_Life;
 using ArcadeTerraria.Games.Snake;
 using ArcadeTerraria.Games.Tetris;
+using ArcadeTerraria.Games.Minesweeper;
 using Terraria.ModLoader;
 
 namespace ArcadeTerraria
@@ -15,8 +16,11 @@ namespace ArcadeTerraria
             /*TetrisGame tetris = new TetrisGame();
             tetris.Load();*/
 
-            LifeGame gameOfLife = new LifeGame();
-            gameOfLife.Load();
+            /*LifeGame gameOfLife = new LifeGame();
+            gameOfLife.Load();*/
+
+            MineSweeperGame mineSweeper = new MineSweeperGame();
+            mineSweeper.Load();
 
 
             base.Load();
