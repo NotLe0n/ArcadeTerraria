@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Terraria;
 
 namespace ArcadeTerraria.Games
@@ -10,6 +11,7 @@ namespace ArcadeTerraria.Games
         public static int drawTimer = 0;
         public static int screenHeight;
         public static int screenWidth;
+        protected MouseState Mouse => Microsoft.Xna.Framework.Input.Mouse.GetState();
 
         internal void Load()
         {

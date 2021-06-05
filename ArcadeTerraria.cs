@@ -1,3 +1,4 @@
+using ArcadeTerraria.Games.Game_of_Life;
 using ArcadeTerraria.Games.Snake;
 using ArcadeTerraria.Games.Tetris;
 using Terraria.ModLoader;
@@ -11,8 +12,11 @@ namespace ArcadeTerraria
             //SnakeGame snake = new SnakeGame();
             //snake.Load();
 
-            TetrisGame tetris = new TetrisGame();
-            tetris.Load();
+            /*TetrisGame tetris = new TetrisGame();
+            tetris.Load();*/
+
+            LifeGame gameOfLife = new LifeGame();
+            gameOfLife.Load();
 
 
             base.Load();
