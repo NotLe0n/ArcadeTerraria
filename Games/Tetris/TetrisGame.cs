@@ -3,19 +3,15 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ReLogic.Graphics;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 
 namespace ArcadeTerraria.Games.Tetris
 {
     public class TetrisGame : TerrariaGame
     {
-        private SpriteBatch spriteBatch => Main.spriteBatch;
-        private Matrix gameMatrix;
-        private KeyboardState lastKeyboard;
+        public override string Name => "Tetris";
+
         public static int gameSpeed = 20;
 
         public static Block[,] blocks = new Block[10, 16];
@@ -23,20 +19,25 @@ namespace ArcadeTerraria.Games.Tetris
         private Tetromino nextTetromino;
         public int score;
 
-        protected override void Initialize()
+        internal override void Load()
         {
             nextTetromino = GenerateTetromino();
         }
 
-        protected override void Update(On.Terraria.Main.orig_DoUpdate orig, Main self, GameTime gameTime)
+        protected override void Unload()
+        {
+            score = 0;
+        }
+
+        internal override void Update(GameTime gameTime)
         {
             if (score >= 120)
             {
-                orig(self, gameTime);
+                EndGame();
                 return;
             }
 
-            base.Update(orig, self, gameTime);
+            base.Update(gameTime);
 
             if (currentTetromino != null)
             {
@@ -74,8 +75,6 @@ namespace ArcadeTerraria.Games.Tetris
 
                 currentTetromino.Update();
             }
-
-            lastKeyboard = Keyboard.GetState();
         }
 
         private void UpdateInput()
@@ -112,22 +111,9 @@ namespace ArcadeTerraria.Games.Tetris
             }
         }
 
-        protected override void Draw(On.Terraria.Main.orig_DoDraw orig, Main self, GameTime gameTime)
+        internal override void Draw(SpriteBatch spriteBatch)
         {
-            if (score >= 120)
-            {
-                orig(self, gameTime);
-                return;
-            }
-
-            base.Draw(orig, self, gameTime);
-
-            Main.graphics.GraphicsDevice.Clear(Color.Black);
-
-            Vector2 drawPosition = new Vector2(screenWidth / 2 - blocks.GetLength(0) * 10, screenHeight / 2 - blocks.GetLength(1) * 10);
-            gameMatrix = Matrix.CreateScale(3) * Matrix.CreateTranslation(new Vector3(drawPosition, 0));
-
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, gameMatrix);
+            base.Draw(spriteBatch);
 
             foreach (var block in blocks)
             {
@@ -143,20 +129,14 @@ namespace ArcadeTerraria.Games.Tetris
             spriteBatch.Draw(Main.magicPixel, new Rectangle(0, 0, 1, blocks.GetLength(1) * 10), Color.White);
             spriteBatch.Draw(Main.magicPixel, new Rectangle(blocks.GetLength(0) * 10, 0, 1, blocks.GetLength(1) * 10), Color.White);
 
-            spriteBatch.End();
+            nextTetromino.Draw(spriteBatch);
+        }
 
+        internal override void DrawText(SpriteBatch spriteBatch)
+        {
             // Draw Score
-            spriteBatch.Begin();
             spriteBatch.DrawString(Main.fontMouseText, "Score: " + score, new Vector2(drawPosition.X + blocks.GetLength(0) * 10 * 3f + 10, drawPosition.Y), Color.White);
             spriteBatch.DrawString(Main.fontMouseText, "next Tetromino: ", new Vector2(drawPosition.X + blocks.GetLength(0) * 10 * 3f + 10, drawPosition.Y + 20), Color.White);
-            spriteBatch.End();
-
-            var nextMatrix = Matrix.CreateScale(3) * Matrix.CreateTranslation(new Vector3(drawPosition + new Vector2(blocks.GetLength(0) * 10 * 2.1f, 40), 0));
-            spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, nextMatrix);
-
-            nextTetromino.Draw(spriteBatch);
-
-            spriteBatch.End();
         }
 
         private Tetromino GenerateTetromino()
@@ -180,7 +160,7 @@ namespace ArcadeTerraria.Games.Tetris
         {
             for (int i = 0; i < blocks.GetLength(0); i++)
             {
-                if (blocks[0, row] == null) 
+                if (blocks[0, row] == null)
                     return false;
             }
             return true;

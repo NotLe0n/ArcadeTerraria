@@ -1,29 +1,56 @@
-using ArcadeTerraria.Games.Game_of_Life;
-using ArcadeTerraria.Games.Snake;
-using ArcadeTerraria.Games.Tetris;
-using ArcadeTerraria.Games.Minesweeper;
+using Microsoft.Xna.Framework;
+using System.Collections.Generic;
+using Terraria;
 using Terraria.ModLoader;
+using Terraria.UI;
 
 namespace ArcadeTerraria
 {
     public class ArcadeTerraria : Mod
     {
+        internal static UserInterface ArcadeUserInterface;
+
         public override void Load()
         {
-            //SnakeGame snake = new SnakeGame();
-            //snake.Load();
-
-            /*TetrisGame tetris = new TetrisGame();
-            tetris.Load();*/
-
-            /*LifeGame gameOfLife = new LifeGame();
-            gameOfLife.Load();*/
-
-            MineSweeperGame mineSweeper = new MineSweeperGame();
-            mineSweeper.Load();
-
+            ArcadeUserInterface = new UserInterface();
+            ArcadeUserInterface.SetState(null);
 
             base.Load();
+        }
+
+        public override void Unload()
+        {
+            ArcadeUserInterface = null;
+        }
+
+        private GameTime _lastUpdateUiGameTime;
+        public override void UpdateUI(GameTime gameTime)
+        {
+            _lastUpdateUiGameTime = gameTime;
+
+            if (ArcadeUserInterface.CurrentState != null)
+            {
+                ArcadeUserInterface.Update(gameTime);
+            }
+        }
+
+        public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
+        {
+            int mouseTextIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
+            if (mouseTextIndex != -1)
+            {
+                layers.Insert(mouseTextIndex, new LegacyGameInterfaceLayer(
+                    "ArcadeTerraria: UI",
+                    delegate
+                    {
+
+                        if (ArcadeUserInterface.CurrentState != null)
+                        {
+                            ArcadeUserInterface.Draw(Main.spriteBatch, _lastUpdateUiGameTime);
+                        }
+                        return true;
+                    }, InterfaceScaleType.UI));
+            }
         }
     }
 }

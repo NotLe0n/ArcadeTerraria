@@ -1,32 +1,33 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework.Input;
+using ReLogic.Graphics;
 using Terraria;
 
 namespace ArcadeTerraria.Games.Minesweeper
 {
     public class MineSweeperGame : TerrariaGame
     {
-        public static int scale = 4;
+        public override string Name => "MineSweeper";
+
         public static Cell[,] cells;
         public static bool lose;
+        private int gameEndTimer;
 
-        private MouseState lastMouse;
-        private bool MouseWithinBounds => Mouse.X > 0 && Mouse.Y > 0 && Mouse.X < cells.GetLength(0) * 10 * scale && Mouse.Y < cells.GetLength(1) * 10 * scale;
+        private bool MouseWithinBounds => Mouse.X > drawPosition.X && Mouse.Y > drawPosition.Y &&
+            Mouse.X < (cells.GetLength(0) * 10 * scale) + drawPosition.X && Mouse.Y < (cells.GetLength(1) * 10 * scale) + drawPosition.Y;
+
         private Point MouseCellPos => new Point(
-            (Mouse.X - Mouse.X % 10) / 10 / scale,
-            (Mouse.Y - Mouse.Y % 10) / 10 / scale);
+            (MousePos.X - MousePos.X % 10) / 10 / scale,
+            (MousePos.Y - MousePos.Y % 10) / 10 / scale);
 
-        protected override void Initialize()
+        internal override void Load()
         {
-            base.Initialize();
+            base.Load();
 
-            cells = new Cell[10, 10];
+            gameEndTimer = 100;
+            lose = false;
+            cells = new Cell[15, 15];
 
             for (int x = 0; x < cells.GetLength(0); x++)
             {
@@ -37,54 +38,69 @@ namespace ArcadeTerraria.Games.Minesweeper
             }
         }
 
-        protected override void Update(On.Terraria.Main.orig_DoUpdate orig, Main self, GameTime gameTime)
+        protected override void Unload()
         {
-            if (GameWon)
-            {
-                orig(self, gameTime);
-                return;
-            }
-
-            base.Update(orig, self, gameTime);
-
-            if (lastMouse.LeftButton != ButtonState.Pressed && Mouse.LeftButton == ButtonState.Pressed)
-            {
-                if (MouseWithinBounds)
-                {
-                    cells[MouseCellPos.X, MouseCellPos.Y].Click();
-                }
-            }
-            if (lastMouse.RightButton != ButtonState.Pressed && Mouse.RightButton == ButtonState.Pressed)
-            {
-                if (MouseWithinBounds)
-                {
-                    cells[MouseCellPos.X, MouseCellPos.Y].ToggleFlag();
-                }
-            }
-            lastMouse = Mouse;
+            lose = false;
+            cells = null;
         }
 
-        protected override void Draw(On.Terraria.Main.orig_DoDraw orig, Main self, GameTime gameTime)
+        internal override void Update(GameTime gameTime)
         {
             if (GameWon)
             {
-                orig(self, gameTime);
-                return;
+                gameEndTimer--;
+                if (gameEndTimer <= 0)
+                {
+                    EndGame();
+                    return;
+                }
+            }
+            if (lose)
+            {
+                gameEndTimer--;
+                if (gameEndTimer <= 0)
+                {
+                    EndGame();
+                    return;
+                }
             }
 
-            base.Draw(orig, self, gameTime);
 
-            Main.graphics.GraphicsDevice.Clear(Color.White);
+            base.Update(gameTime);
 
-            var gameMatrix = Matrix.CreateScale(scale) * Matrix.CreateTranslation(new Vector3(0, 0, 0));
+            if (gameTimer > 10)
+            {
+                if (lastMouse.LeftButton != ButtonState.Pressed && Mouse.LeftButton == ButtonState.Pressed)
+                {
+                    if (MouseWithinBounds && MouseCellPos.X < cells.GetLength(0) && MouseCellPos.Y < cells.GetLength(1))
+                    {
+                        cells[MouseCellPos.X, MouseCellPos.Y].Click();
+                    }
+                }
+                if (lastMouse.RightButton != ButtonState.Pressed && Mouse.RightButton == ButtonState.Pressed)
+                {
+                    if (MouseWithinBounds && MouseCellPos.X < cells.GetLength(0) && MouseCellPos.Y < cells.GetLength(1))
+                    {
+                        cells[MouseCellPos.X, MouseCellPos.Y].ToggleFlag();
+                    }
+                }
+            }
+        }
 
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, gameMatrix);
+        internal override void Draw(SpriteBatch spriteBatch)
+        {
+            if (GameWon)
+            {
+                EndGame();
+            }
+
+            base.Draw(spriteBatch);
 
             foreach (var cell in cells)
             {
                 cell.Draw(Main.spriteBatch);
             }
-            foreach(var cell in cells)
+            foreach (var cell in cells)
             {
                 cell.DrawNum(Main.spriteBatch);
             }
@@ -93,8 +109,11 @@ namespace ArcadeTerraria.Games.Minesweeper
             {
                 Main.spriteBatch.Draw(Main.magicPixel, new Rectangle(MouseCellPos.X * 10 + 1, MouseCellPos.Y * 10 + 1, 9, 9), Color.White * 0.5f);
             }
+        }
 
-            Main.spriteBatch.End();
+        internal override void DrawText(SpriteBatch spriteBatch)
+        {
+            spriteBatch.DrawString(Main.fontMouseText, NumMines.ToString(), Vector2.Zero, Color.Black);
         }
 
         private bool GameWon
@@ -111,6 +130,22 @@ namespace ArcadeTerraria.Games.Minesweeper
                     }
                 }
                 return true;
+            }
+        }
+
+        private int NumMines
+        {
+            get
+            {
+                int num = 0;
+                foreach (var cell in cells)
+                {
+                    if (cell.mine)
+                    {
+                        num++;
+                    }
+                }
+                return num;
             }
         }
     }

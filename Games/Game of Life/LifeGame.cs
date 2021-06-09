@@ -2,10 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 
 namespace ArcadeTerraria.Games.Game_of_Life
@@ -13,26 +9,37 @@ namespace ArcadeTerraria.Games.Game_of_Life
     // This doesn't work like Conway's game of life, but it's still super cool
     public class LifeGame : TerrariaGame
     {
+        public override string Name => "Leon's Game of Life";
+
         private int[,] cells;
         private const int cellWidth = 1;
         private bool playing = false;
-        private KeyboardState lastKeyboard;
-        private bool MouseWithinBounds => Mouse.X > 0 && Mouse.Y > 0 && Mouse.X < cells.GetLength(0) * cellWidth && Mouse.Y < cells.GetLength(1) * cellWidth;
 
-        protected override void Initialize()
+        private bool MouseWithinBounds => Mouse.X > drawPosition.X && Mouse.Y > drawPosition.Y &&
+            Mouse.X < (cells.GetLength(0) * 10 * scale) + drawPosition.X && Mouse.Y < (cells.GetLength(1) * 10 * scale) + drawPosition.Y;
+
+        private Point MouseCellPos => new Point(
+            (MousePos.X - MousePos.X % cellWidth) / cellWidth / scale,
+            (MousePos.Y - MousePos.Y % cellWidth) / cellWidth / scale);
+
+        private bool drawCross = true;
+        private bool drawGrid = false;
+        private int gameSpeed = 10;
+
+        internal override void Load()
         {
-            base.Initialize();
+            base.Load();
 
-            cells = new int[1023, 1023];
+            cells = new int[150, 150];
         }
 
-        protected override void Update(On.Terraria.Main.orig_DoUpdate orig, Main self, GameTime gameTime)
+        internal override void Update(GameTime gameTime)
         {
-            base.Update(orig, self, gameTime);
+            base.Update(gameTime);
 
             UpdateInput();
 
-            if (playing && gameTimer % 10 == 0)
+            if (playing && gameTimer % gameSpeed == 0)
             {
                 var nextCells = new int[cells.GetLength(0), cells.GetLength(1)];
 
@@ -40,7 +47,7 @@ namespace ArcadeTerraria.Games.Game_of_Life
                 {
                     for (int y = 0; y < cells.GetLength(1); y++)
                     {
-                        if (nextCells[x, y] == 0 && CountNeighbors(x, y) == 1)
+                        if (nextCells[x, y] == 0 && CountNeighbors(x, y) == 3)
                         {
                             nextCells[x, y] = 1;
                         }
@@ -56,54 +63,49 @@ namespace ArcadeTerraria.Games.Game_of_Life
                 }
                 cells = nextCells;
             }
-
-            lastKeyboard = Keyboard.GetState();
         }
 
-        protected override void Draw(On.Terraria.Main.orig_DoDraw orig, Main self, GameTime gameTime)
+        internal override void Draw(SpriteBatch spriteBatch)
         {
-            base.Draw(orig, self, gameTime);
-            Main.graphics.GraphicsDevice.Clear(Color.White);
-
-            var gameMatrix = Matrix.CreateScale(1) * Matrix.CreateTranslation(new Vector3(0, 0, 0));
-
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null, null, gameMatrix);
+            base.Draw(spriteBatch);
 
             for (int x = 0; x < cells.GetLength(0); x++)
             {
-                // Draw Grid x
-                //Main.spriteBatch.Draw(Main.magicPixel, new Rectangle(x * cellWidth, 0, 1, cellWidth * cells.GetLength(1)), Color.Black);
                 for (int y = 0; y < cells.GetLength(1); y++)
                 {
                     // Draw Grid y
-                    //Main.spriteBatch.Draw(Main.magicPixel, new Rectangle(0, y * cellWidth, cellWidth * cells.GetLength(0), 1), Color.Black);
+                    if (drawGrid)
+                    {
+                        spriteBatch.Draw(Main.magicPixel, new Rectangle(x * cellWidth, y * cellWidth, 1, cellWidth), Color.Black);
+                        spriteBatch.Draw(Main.magicPixel, new Rectangle(0, y * cellWidth, cellWidth * cells.GetLength(0), 1), Color.Black);
+                    }
 
                     // Draw Cells
                     if (cells[x, y] == 1)
                     {
-                        Main.spriteBatch.Draw(Main.magicPixel, new Rectangle(x * cellWidth, y * cellWidth, cellWidth, cellWidth), Color.Black);
+                        spriteBatch.Draw(Main.magicPixel, new Rectangle(x * cellWidth, y * cellWidth, cellWidth, cellWidth), Color.Black);
                     }
                 }
             }
 
-
             // Draw Border
-            Main.spriteBatch.Draw(Main.magicPixel, new Rectangle(0, 0, cellWidth * cells.GetLength(0), 1), Color.Black);
-            Main.spriteBatch.Draw(Main.magicPixel, new Rectangle(0, 0, 1, cellWidth * cells.GetLength(0)), Color.Black);
-            Main.spriteBatch.Draw(Main.magicPixel, new Rectangle(0, cellWidth * cells.GetLength(0), cellWidth * cells.GetLength(0), 1), Color.Black);
-            Main.spriteBatch.Draw(Main.magicPixel, new Rectangle(cellWidth * cells.GetLength(0), 0, 1, cellWidth * cells.GetLength(0)), Color.Black);
+            spriteBatch.Draw(Main.magicPixel, new Rectangle(0, 0, cellWidth * cells.GetLength(0), 1), Color.Black);
+            spriteBatch.Draw(Main.magicPixel, new Rectangle(0, 0, 1, cellWidth * cells.GetLength(0)), Color.Black);
+            spriteBatch.Draw(Main.magicPixel, new Rectangle(0, cellWidth * cells.GetLength(0), cellWidth * cells.GetLength(0), 1), Color.Black);
+            spriteBatch.Draw(Main.magicPixel, new Rectangle(cellWidth * cells.GetLength(0), 0, 1, cellWidth * cells.GetLength(0)), Color.Black);
 
             // Draw Cross
-            Main.spriteBatch.Draw(Main.magicPixel, new Rectangle(0, cellWidth * cells.GetLength(0) / 2, cellWidth * cells.GetLength(0), 1), Color.Red);
-            Main.spriteBatch.Draw(Main.magicPixel, new Rectangle(cellWidth * cells.GetLength(1) / 2, 0, 1, cellWidth * cells.GetLength(0)), Color.Red);
+            if (drawCross)
+            {
+                spriteBatch.Draw(Main.magicPixel, new Rectangle(0, cellWidth * cells.GetLength(0) / 2, cellWidth * cells.GetLength(0), 1), Color.Red);
+                spriteBatch.Draw(Main.magicPixel, new Rectangle(cellWidth * cells.GetLength(1) / 2, 0, 1, cellWidth * cells.GetLength(0)), Color.Red);
+            }
 
             // Draw Mouse
             if (!playing && MouseWithinBounds)
             {
-                Main.spriteBatch.Draw(Main.magicPixel, new Rectangle(Mouse.X - Mouse.X % cellWidth, Mouse.Y - Mouse.Y % cellWidth, cellWidth, cellWidth), Color.Gray); 
+                spriteBatch.Draw(Main.magicPixel, new Rectangle(MouseCellPos.X * cellWidth, MouseCellPos.Y * cellWidth, cellWidth, cellWidth), Color.Gray);
             }
-
-            Main.spriteBatch.End();
         }
 
         private int CountNeighbors(int i, int j)
@@ -129,25 +131,35 @@ namespace ArcadeTerraria.Games.Game_of_Life
 
         private void UpdateInput()
         {
-            if (!lastKeyboard.IsKeyDown(Keys.Space) && Keyboard.GetState().IsKeyDown(Keys.Space))
-            {
-                playing = !playing;
-            }
-            if (!lastKeyboard.IsKeyDown(Keys.R) && Keyboard.GetState().IsKeyDown(Keys.R))
-            {
-                cells = new int[cells.GetLength(0), cells.GetLength(1)];
-            }
+            ToggleKeybind(Keys.Space, () => playing = !playing);
+            ToggleKeybind(Keys.R, () => cells = new int[cells.GetLength(0), cells.GetLength(1)]);
+            ToggleKeybind(Keys.C, () => drawCross = !drawCross);
+            ToggleKeybind(Keys.G, () => drawGrid = !drawGrid);
 
             if (!playing && MouseWithinBounds)
             {
                 if (Mouse.LeftButton == ButtonState.Pressed)
                 {
-                    cells[(Mouse.X - Mouse.X % cellWidth) / cellWidth, (Mouse.Y - Mouse.Y % cellWidth) / cellWidth] = 1;
+                    if (MouseWithinBounds && MouseCellPos.X < cells.GetLength(0) && MouseCellPos.Y < cells.GetLength(1))
+                    {
+                        cells[MouseCellPos.X, MouseCellPos.Y] = 1;
+                    }
                 }
                 else if (Mouse.RightButton == ButtonState.Pressed)
                 {
-                    cells[(Mouse.X - Mouse.X % cellWidth) / cellWidth, (Mouse.Y - Mouse.Y % cellWidth) / cellWidth] = 0;
+                    if (MouseWithinBounds && MouseCellPos.X < cells.GetLength(0) && MouseCellPos.Y < cells.GetLength(1))
+                    {
+                        cells[MouseCellPos.X, MouseCellPos.Y] = 0;
+                    }
                 }
+            }
+        }
+
+        private void ToggleKeybind(Keys key, Action action)
+        {
+            if (!lastKeyboard.IsKeyDown(key) && Keyboard.GetState().IsKeyDown(key))
+            {
+                action.Invoke();
             }
         }
     }

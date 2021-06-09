@@ -7,74 +7,63 @@ namespace ArcadeTerraria.Games.Snake
 {
     public class SnakeGame : TerrariaGame
     {
-        public SpriteBatch spriteBatch => Main.spriteBatch;
-        public Matrix gameMatrix;
+        public override string Name => "Snake";
 
         public Snake snake;
         public static Food food;
-        public static int points = 0;
-        public static bool lose = false;
+        public static int points;
+        public static bool lose;
 
         public static int screenCellHeight;
         public static int screenCellWidth;
 
-        protected override void Initialize()
+        internal override void Load()
         {
+            base.Load();
+
+            lose = false;
+            points = 0;
             snake = new Snake(new Point(10, 100));
             food = new Food(new Point(10, 20));
         }
 
-        protected override void Update(On.Terraria.Main.orig_DoUpdate orig, Main self, GameTime gameTime)
+        protected override void Unload()
         {
-            if (points >= 10)
-            {
-                orig(self, gameTime);
-                return;
-            }
+            food = null;
+            points = 0;
+            lose = false;
+        }
 
-            base.Update(orig, self, gameTime);
-
-            // values for 1080p screen (windowed): 630, 330
-            screenCellHeight = screenHeight / 3 - 10 - (!Main.graphics.IsFullScreen ? 20 : 0);
-            screenCellWidth = screenWidth / 3 - 10;
-
-            snake.Update();
-
+        internal override void Update(GameTime gameTime)
+        {
             if (lose)
             {
-                Main.instance.Exit();
+                EndGame();
+            }
+
+            base.Update(gameTime);
+
+            screenCellWidth = 140;
+            screenCellHeight = 140;
+
+            snake.UpdateDirection();
+            if (gameTimer % 10 == 0)
+            {
+                snake.Update();
             }
         }
 
-        protected override void Draw(On.Terraria.Main.orig_DoDraw orig, Main self, GameTime gameTime)
+        internal override void Draw(SpriteBatch spriteBatch)
         {
-            if (points >= 10)
-            {
-                orig(self, gameTime);
-                return;
-            }
-            
-            base.Draw(orig, self, gameTime);
-
-            Main.graphics.GraphicsDevice.Clear(Color.White);
-
-            gameMatrix = Matrix.CreateScale(3);
-            spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, gameMatrix);
+            base.Draw(spriteBatch);
 
             snake.Draw(spriteBatch);
             food.Draw(spriteBatch);
+        }
 
-            spriteBatch.End();
-
-            spriteBatch.Begin();
-
-            if (gameTimer < 200)
-            {
-                spriteBatch.DrawString(Main.fontDeathText, "get 10 points to play terraria", new Vector2(screenWidth / 3, screenHeight / 3), Color.Black * (10f / drawTimer));
-            }
-
+        internal override void DrawText(SpriteBatch spriteBatch)
+        {
             spriteBatch.DrawString(Main.fontMouseText, "points: " + points, Vector2.One, Color.Black);
-            spriteBatch.End();
         }
     }
 }

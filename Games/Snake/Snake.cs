@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System;
 using System.Collections.Generic;
 using Terraria;
 
@@ -22,23 +21,18 @@ namespace ArcadeTerraria.Games.Snake
 
         public void Update()
         {
-            UpdateDirection();
+            UpdatePostion();
 
-            if (TerrariaGame.gameTimer % 10 == 0)
+            FoodCollision();
+
+            // Body Collsion
+            if (body.Exists(x => x.rect.Contains(head)))
             {
-                UpdatePostion();
-
-                FoodCollision();
-
-                // Body Collsion
-                if (body.Exists(x => x.rect.Contains(head)))
-                {
-                    SnakeGame.lose = true;
-                }
+                SnakeGame.lose = true;
             }
         }
 
-        private void UpdateDirection()
+        public void UpdateDirection()
         {
             // Update Direction
             if (Keyboard.GetState().IsKeyDown(Keys.W))
@@ -116,12 +110,23 @@ namespace ArcadeTerraria.Games.Snake
                     body.Add(new SnakeBody((head.Location.ToVector2() - new Vector2(direction.x, direction.y) * speed).ToPoint()));
                 }
 
-                // Generate new Food
-                int randX = new Random(TerrariaGame.gameTimer).Next(0, SnakeGame.screenCellWidth);
-                int randY = new Random().Next(0, SnakeGame.screenCellHeight);
+                GenerateFood();
+            }
+        }
 
-                // "/ 10 * 10" is there to make it divideable by 10
-                SnakeGame.food = new Food(new Point(randX / 10 * 10, randY / 10 * 10));
+        private void GenerateFood()
+        {
+            // Generate new Food
+            // "/ 10 * 10" is there to make it divideable by 10
+            var randPos = new Point(Main.rand.Next(0, SnakeGame.screenCellWidth) / 10 * 10, Main.rand.Next(0, SnakeGame.screenCellHeight) / 10 * 10);
+
+            if (!body.Exists(x => x.rect.Contains(randPos)) && !head.Contains(randPos))
+            {
+                SnakeGame.food = new Food(randPos);
+            }
+            else
+            {
+                GenerateFood();
             }
         }
 

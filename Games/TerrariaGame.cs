@@ -2,42 +2,79 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
+using Terraria.ID;
 
 namespace ArcadeTerraria.Games
 {
     public class TerrariaGame
     {
-        public static int gameTimer = 0;
-        public static int drawTimer = 0;
-        public static int screenHeight;
-        public static int screenWidth;
-        protected MouseState Mouse => Microsoft.Xna.Framework.Input.Mouse.GetState();
+        public virtual string Name { get; }
+        public byte scale = 3;
 
-        internal void Load()
+        private bool gameEnd;
+        public int gameTimer;
+        public int drawTimer;
+        public int screenHeight;
+        public int screenWidth;
+        public Vector2 drawPosition;
+        public Color backgroundColor = Color.White;
+
+        protected KeyboardState lastKeyboard;
+        protected MouseState lastMouse;
+        public MouseState Mouse => Microsoft.Xna.Framework.Input.Mouse.GetState();
+        public Point MousePos => new Point(Main.mouseX - (int)drawPosition.X, Main.mouseY - (int)drawPosition.Y);
+
+        internal virtual void Load()
         {
-            Initialize();
-            LoadContent();
-
-            Main.musicVolume = 0;
-            On.Terraria.Main.DoUpdate += Update;
-            On.Terraria.Main.DoDraw += Draw;
+            gameTimer = 0;
+            drawTimer = 0;
         }
 
-        protected virtual void Initialize() { }
+        protected virtual void Unload()
+        {
+        }
 
-        protected virtual void LoadContent() { }
+        protected virtual void DrawFullscreen(On.Terraria.Main.orig_DoDraw orig, Main self, GameTime gameTime)
+        {
+            if (gameEnd)
+            {
+                orig(self, gameTime);
+                return;
+            }
 
-        protected virtual void Draw(On.Terraria.Main.orig_DoDraw orig, Main self, GameTime gameTime) 
+            Main.graphics.GraphicsDevice.Clear(Color.White);
+
+            Draw(Main.spriteBatch);
+
+            Main.spriteBatch.End();
+        }
+
+        internal virtual void Update(GameTime gameTime)
+        {
+            gameTimer++;
+            Main.player[Main.myPlayer].frozen = true;
+
+            lastMouse = Mouse;
+            lastKeyboard = Main.keyState;
+        }
+
+        internal virtual void Draw(SpriteBatch spriteBatch)
         {
             drawTimer++;
         }
 
-        protected virtual void Update(On.Terraria.Main.orig_DoUpdate orig, Main self, GameTime gameTime) 
+        internal virtual void DrawText(SpriteBatch spriteBatch)
         {
-            gameTimer++;
 
-            screenHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
-            screenWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+        }
+
+        public void EndGame()
+        {
+            gameEnd = true;
+            ArcadeTerraria.ArcadeUserInterface.SetState(null);
+            Main.PlaySound(SoundID.MenuClose);
+
+            Unload();
         }
     }
 }

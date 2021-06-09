@@ -1,11 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ArcadeTerraria.Games.Tetris
 {
@@ -46,7 +41,7 @@ namespace ArcadeTerraria.Games.Tetris
                 foreach (var block in blocks[rotation])
                 {
                     TetrisGame.blocks[block.cellPosition.X, block.cellPosition.Y] = block;
-                
+
                 }
             }
         }
