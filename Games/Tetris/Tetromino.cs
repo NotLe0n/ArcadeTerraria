@@ -312,15 +312,28 @@ namespace ArcadeTerraria.Games.Tetris
         public void MoveHorizontally(int direction)
         {
             // all blocks are within the horizontal boundaries of the level
-            bool withinBoundaries = blocks[rotation].All(x => x.cellPosition.X + direction >= 0 && x.cellPosition.X + direction < TetrisGame.blocks.GetLength(0) - 1);
+            bool withinBoundaries = blocks[rotation].All(x => x.cellPosition.X + direction >= 0 && x.cellPosition.X + direction < TetrisGame.blocks.GetLength(0));
 
             // there are no blocks in the direction you want to move and those blocks are not your own
-            bool noBlocksInDirection = blocks[rotation].Any(x => TetrisGame.blocks[x.cellPosition.X + direction, x.cellPosition.Y] == null
-                && !blocks[rotation].Contains(TetrisGame.blocks[x.cellPosition.X + direction, x.cellPosition.Y]));
-
-            if (withinBoundaries && noBlocksInDirection)
+            if (withinBoundaries)
             {
-                pos.X += direction;
+                bool noBlocksInDirection = true;
+                foreach (var block in blocks[rotation])
+                {
+                    if (blocks[rotation].Contains(TetrisGame.blocks[block.cellPosition.X + direction, block.cellPosition.Y]))
+                        continue;
+
+                    if (TetrisGame.blocks[block.cellPosition.X + direction, block.cellPosition.Y] != null)
+                    {
+                        noBlocksInDirection = false;
+                        break;
+                    }
+                }
+
+                if (noBlocksInDirection)
+                {
+                    pos.X += direction;
+                }
             }
         }
     }

@@ -8,7 +8,8 @@ namespace ArcadeTerraria.Tiles
     {
         protected override TerrariaGame Game => new TetrisGame
         {
-            backgroundColor = Color.Black
+            backgroundColor = Color.Black,
+            scale = 2
         };
     }
 }

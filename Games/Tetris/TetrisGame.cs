@@ -12,9 +12,9 @@ namespace ArcadeTerraria.Games.Tetris
     {
         public override string Name => "Tetris";
 
-        public static int gameSpeed = 20;
+        public static int gameSpeed = 50;
 
-        public static Block[,] blocks = new Block[10, 16];
+        public static Block[,] blocks;
         private Tetromino currentTetromino;
         private Tetromino nextTetromino;
         public int score;
@@ -22,16 +22,18 @@ namespace ArcadeTerraria.Games.Tetris
         internal override void Load()
         {
             nextTetromino = GenerateTetromino();
+            blocks = new Block[10, 16];
         }
 
         protected override void Unload()
         {
             score = 0;
+            blocks = null;
         }
 
         internal override void Update(GameTime gameTime)
         {
-            if (score >= 120)
+            if (score >= 2000)
             {
                 EndGame();
                 return;
@@ -59,7 +61,7 @@ namespace ArcadeTerraria.Games.Tetris
                 {
                     currentTetromino = null;
 
-                    CheckGameLost();
+                    if (CheckGameLost()) return;
                 }
 
                 if (currentTetromino == null)
@@ -81,7 +83,6 @@ namespace ArcadeTerraria.Games.Tetris
         {
             if (!lastKeyboard.IsKeyDown(Keys.W) && Keyboard.IsKeyDown(Keys.W))
             {
-                currentTetromino.DestroyTetromino();
                 currentTetromino.rotation = (currentTetromino.rotation + 1) % 4;
             }
 
@@ -135,8 +136,8 @@ namespace ArcadeTerraria.Games.Tetris
         internal override void DrawText(SpriteBatch spriteBatch)
         {
             // Draw Score
-            spriteBatch.DrawString(Main.fontMouseText, "Score: " + score, new Vector2(drawPosition.X + blocks.GetLength(0) * 10 * 3f + 10, drawPosition.Y), Color.White);
-            spriteBatch.DrawString(Main.fontMouseText, "next Tetromino: ", new Vector2(drawPosition.X + blocks.GetLength(0) * 10 * 3f + 10, drawPosition.Y + 20), Color.White);
+            spriteBatch.DrawString(Main.fontMouseText, "Score: " + score, new Vector2(blocks.GetLength(0) * 10 * 2 + 20, 0), Color.White);
+            spriteBatch.DrawString(Main.fontMouseText, "next Tetromino: ", new Vector2(blocks.GetLength(0) * 10 * 2+ 20, 20), Color.White);
         }
 
         private Tetromino GenerateTetromino()
@@ -145,22 +146,24 @@ namespace ArcadeTerraria.Games.Tetris
             return new Tetromino((TetrominoID)rand);
         }
 
-        private void CheckGameLost()
+        private bool CheckGameLost()
         {
             for (int i = 0; i < blocks.GetLength(0); i++)
             {
                 if (blocks[i, 2] != null)
                 {
-                    Main.instance.Exit();
+                    EndGame();
+                    return true;
                 }
             }
+            return false;
         }
 
         private bool IsRowFull(int row)
         {
             for (int i = 0; i < blocks.GetLength(0); i++)
             {
-                if (blocks[0, row] == null)
+                if (blocks[i, row] == null)
                     return false;
             }
             return true;
@@ -168,15 +171,20 @@ namespace ArcadeTerraria.Games.Tetris
 
         private void FallWhenRowIsFull()
         {
-            for (int y = blocks.GetLength(1) - 1; y > 0; y--)
+            for (int i = blocks.GetLength(1) - 1; i >= 0; i--)
             {
-                if (IsRowFull(y))
+                if (IsRowFull(i))
                 {
-                    for (int x = 0; x < blocks.GetLength(0); x++)
+                    for (int y = blocks.GetLength(1) - 1; y > 0; y--)
                     {
-                        blocks[x, y] = blocks[x, y - 1];
+                        for (int x = 0; x < blocks.GetLength(0); x++)
+                        {
+                            blocks[x, y] = blocks[x, y - 1];
+                        }
+                        score += blocks.GetLength(0);
                     }
-                    score += blocks.GetLength(0);
+
+                    FallWhenRowIsFull();
                 }
             }
         }
