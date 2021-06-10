@@ -79,32 +79,32 @@ namespace ArcadeTerraria.Games.Tetris
 
         private void UpdateInput()
         {
-            if (!lastKeyboard.IsKeyDown(Keys.W) && Keyboard.GetState().IsKeyDown(Keys.W))
+            if (!lastKeyboard.IsKeyDown(Keys.W) && Keyboard.IsKeyDown(Keys.W))
             {
                 currentTetromino.DestroyTetromino();
                 currentTetromino.rotation = (currentTetromino.rotation + 1) % 4;
             }
 
-            gameSpeed = Keyboard.GetState().IsKeyDown(Keys.S) ? 2 : 10;
+            gameSpeed = Keyboard.IsKeyDown(Keys.S) ? 2 : 10;
 
-            if (!lastKeyboard.IsKeyDown(Keys.A) && Keyboard.GetState().IsKeyDown(Keys.A))
+            if (!lastKeyboard.IsKeyDown(Keys.A) && Keyboard.IsKeyDown(Keys.A))
             {
                 currentTetromino.MoveHorizontally(-1);
             }
 
-            if (!lastKeyboard.IsKeyDown(Keys.D) && Keyboard.GetState().IsKeyDown(Keys.D))
+            if (!lastKeyboard.IsKeyDown(Keys.D) && Keyboard.IsKeyDown(Keys.D))
             {
                 currentTetromino.MoveHorizontally(1);
             }
 
             if (gameTimer % 10 == 0)
             {
-                if (Keyboard.GetState().IsKeyDown(Keys.A))
+                if (Keyboard.IsKeyDown(Keys.A))
                 {
                     currentTetromino.MoveHorizontally(-1);
                 }
 
-                if (Keyboard.GetState().IsKeyDown(Keys.D))
+                if (Keyboard.IsKeyDown(Keys.D))
                 {
                     currentTetromino.MoveHorizontally(1);
                 }

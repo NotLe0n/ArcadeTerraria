@@ -157,7 +157,7 @@ namespace ArcadeTerraria.Games.Game_of_Life
 
         private void ToggleKeybind(Keys key, Action action)
         {
-            if (!lastKeyboard.IsKeyDown(key) && Keyboard.GetState().IsKeyDown(key))
+            if (!lastKeyboard.IsKeyDown(key) && Keyboard.IsKeyDown(key))
             {
                 action.Invoke();
             }
