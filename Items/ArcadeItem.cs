@@ -3,12 +3,12 @@ using Terraria.ModLoader;
 
 namespace ArcadeTerraria.Items
 {
-    class LifeGameArcade : ModItem
+    abstract class ArcadeItem<T> : ModItem where T : ModTile
     {
         public override void SetDefaults()
         {
             item.CloneDefaults(ItemID.AlphabetStatue0);
-            item.createTile = ModContent.TileType<Tiles.LifeGameArcade>();
+            item.createTile = ModContent.TileType<T>();
         }
     }
 }
