@@ -43,7 +43,7 @@ namespace ArcadeTerraria.Games.Snake
 
             base.Update(gameTime);
 
-            screenCellWidth = 140;
+            screenCellWidth = 150;
             screenCellHeight = 140;
 
             snake.UpdateDirection();

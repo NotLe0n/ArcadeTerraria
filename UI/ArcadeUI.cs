@@ -25,10 +25,10 @@ namespace ArcadeTerraria.UI
             Append(panel);
 
             var screen = new GameScreen(game);
-            screen.Top.Set(40, 0);
+            screen.Top.Set(35, 0);
             screen.Left.Set(10, 0);
-            screen.Width.Set(450, 0);
-            screen.Height.Set(450, 0);
+            screen.Width.Set(500, 0);
+            screen.Height.Set(455, 0);
             panel.Append(screen);
 
             base.OnInitialize();

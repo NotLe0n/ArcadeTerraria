@@ -56,6 +56,8 @@ namespace ArcadeTerraria.UI
             }
 
             game.Update(gameTime);
+
+            game.UpdateInput();
         }
     }
 }

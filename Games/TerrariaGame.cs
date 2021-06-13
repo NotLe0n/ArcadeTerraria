@@ -20,7 +20,7 @@ namespace ArcadeTerraria.Games
 
         // input stuff
         public MouseState Mouse => Microsoft.Xna.Framework.Input.Mouse.GetState();
-        public KeyboardState Keyboard => Main.keyState;
+        public KeyboardState Keyboard => Microsoft.Xna.Framework.Input.Keyboard.GetState();
         protected KeyboardState lastKeyboard;
         protected MouseState lastMouse;
         public Point MousePos => new Point(Main.mouseX - (int)drawPosition.X, Main.mouseY - (int)drawPosition.Y);
@@ -39,9 +39,12 @@ namespace ArcadeTerraria.Games
         {
             gameTimer++;
             Main.player[Main.myPlayer].frozen = true;
+        }
 
+        internal void UpdateInput()
+        {
             lastMouse = Mouse;
-            lastKeyboard = Main.keyState;
+            lastKeyboard = Keyboard;
         }
 
         internal virtual void Draw(SpriteBatch spriteBatch)
