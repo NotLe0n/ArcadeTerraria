@@ -38,7 +38,14 @@ namespace ArcadeTerraria.Games.Snake
         {
             if (lose)
             {
+                if (points >= 2)
+                {
+                    WinGame();
+                    return;
+                }
+
                 EndGame();
+                return;
             }
 
             base.Update(gameTime);

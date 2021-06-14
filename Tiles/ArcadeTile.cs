@@ -1,6 +1,8 @@
 ﻿using ArcadeTerraria.Games;
 using ArcadeTerraria.UI;
+using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 
@@ -9,6 +11,8 @@ namespace ArcadeTerraria.Tiles
     public abstract class ArcadeTile : ModTile
     {
         protected abstract TerrariaGame Game { get; }
+        private TerrariaGame _game;
+        private Vector2 position;
 
         public override void SetDefaults()
         {
@@ -20,12 +24,26 @@ namespace ArcadeTerraria.Tiles
             TileObjectData.newTile.CopyFrom(TileObjectData.Style3x3);
             TileObjectData.newTile.Width = 2;
             TileObjectData.addTile(Type);
+
+            _game = Game;
         }
 
         public override bool NewRightClick(int i, int j)
         {
-            ArcadeTerraria.ArcadeUserInterface.SetState(new ArcadeUI(Game));
+            position = new Vector2(i * 16, j * 16);
+
+            ArcadeTerraria.ArcadeUserInterface.SetState(new ArcadeUI(_game));
+            _game.OnWinGame += DropCoins;
+
             return true;
+        }
+
+        public void DropCoins()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                Item.NewItem(position, new Vector2(10, 10), ItemID.SilverCoin, Main.rand.Next(0, 4));
+            }
         }
     }
 }

@@ -51,7 +51,7 @@ namespace ArcadeTerraria.Games.Minesweeper
                 gameEndTimer--;
                 if (gameEndTimer <= 0)
                 {
-                    EndGame();
+                    WinGame();
                     return;
                 }
             }
@@ -89,9 +89,12 @@ namespace ArcadeTerraria.Games.Minesweeper
 
         internal override void Draw(SpriteBatch spriteBatch)
         {
-            if (GameWon)
+            if (GameWon || lose)
             {
-                EndGame();
+                if (gameEndTimer <= 0)
+                {
+                    return;
+                }
             }
 
             base.Draw(spriteBatch);

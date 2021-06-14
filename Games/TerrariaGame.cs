@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.ID;
+using System;
 
 namespace ArcadeTerraria.Games
 {
@@ -10,20 +11,20 @@ namespace ArcadeTerraria.Games
     {
         public virtual string Name { get; }
         public byte scale = 3;
+        public Color backgroundColor = Color.White;
 
-        public int gameTimer;
-        public int drawTimer;
+        protected int gameTimer;
+        protected int drawTimer;
         public int screenHeight;
         public int screenWidth;
         public Vector2 drawPosition;
-        public Color backgroundColor = Color.White;
 
         // input stuff
-        public MouseState Mouse => Microsoft.Xna.Framework.Input.Mouse.GetState();
-        public KeyboardState Keyboard => Microsoft.Xna.Framework.Input.Keyboard.GetState();
+        protected MouseState Mouse => Microsoft.Xna.Framework.Input.Mouse.GetState();
+        protected KeyboardState Keyboard => Microsoft.Xna.Framework.Input.Keyboard.GetState();
         protected KeyboardState lastKeyboard;
         protected MouseState lastMouse;
-        public Point MousePos => new Point(Main.mouseX - (int)drawPosition.X, Main.mouseY - (int)drawPosition.Y);
+        protected Point MousePos => new Point(Main.mouseX - (int)drawPosition.X, Main.mouseY - (int)drawPosition.Y);
 
         internal virtual void Load()
         {
@@ -64,5 +65,14 @@ namespace ArcadeTerraria.Games
 
             Unload();
         }
+
+        protected void WinGame()
+        {
+            OnWinGame?.Invoke();
+
+            EndGame();
+        }
+
+        public event Action OnWinGame;
     }
 }
