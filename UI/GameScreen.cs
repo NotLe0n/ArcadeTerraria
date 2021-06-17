@@ -48,8 +48,16 @@ namespace ArcadeTerraria.UI
             spriteBatch.Begin();
         }
 
+        uint lastGameUpdateCount = 0;
         public override void Update(GameTime gameTime)
         {
+            if (Main.GameUpdateCount != lastGameUpdateCount)
+            {
+                game.Update(gameTime);
+
+                game.UpdateInput();
+            }
+
             base.Update(gameTime);
 
             if (ContainsPoint(Main.MouseScreen))
@@ -57,9 +65,7 @@ namespace ArcadeTerraria.UI
                 Main.LocalPlayer.mouseInterface = true;
             }
 
-            game.Update(gameTime);
-
-            game.UpdateInput();
+            lastGameUpdateCount = Main.GameUpdateCount;
         }
     }
 }
