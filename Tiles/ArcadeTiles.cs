@@ -1,4 +1,5 @@
 ﻿using ArcadeTerraria.Games;
+using ArcadeTerraria.Games.Breakout;
 using ArcadeTerraria.Games.Game_of_Life;
 using ArcadeTerraria.Games.Minesweeper;
 using ArcadeTerraria.Games.Snake;
@@ -27,6 +28,14 @@ namespace ArcadeTerraria.Tiles
         protected override TerrariaGame Game => new TetrisGame
         {
             backgroundColor = Color.Black,
+            scale = 2 
+        };
+    }
+
+    class BreakoutArcade : ArcadeTile
+    {
+        protected override TerrariaGame Game => new BreakoutGame 
+        {
             scale = 2
         };
     }

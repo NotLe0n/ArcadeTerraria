@@ -14,8 +14,6 @@ namespace ArcadeTerraria.UI
 
         public override void OnInitialize()
         {
-            game.Load();
-
             var panel = new DragableUIPanel(game.Name);
             panel.Width.Set(500, 0);
             panel.Height.Set(500, 0);

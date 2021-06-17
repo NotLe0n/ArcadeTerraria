@@ -7,4 +7,6 @@
     class SnakeArcade : ArcadeItem<Tiles.SnakeArcade> { }
 
     class TetrisArcade : ArcadeItem<Tiles.TetrisArcade> { }
+
+    class BreakoutArcade : ArcadeItem<Tiles.BreakoutArcade> { }
 }

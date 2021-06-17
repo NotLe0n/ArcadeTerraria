@@ -19,6 +19,8 @@ namespace ArcadeTerraria.UI
         {
             game.screenWidth = (int)GetDimensions().Width;
             game.screenHeight = (int)GetDimensions().Height;
+
+            game.Load();
         }
 
         public override void Draw(SpriteBatch spriteBatch)
