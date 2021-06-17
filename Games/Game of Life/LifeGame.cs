@@ -37,7 +37,7 @@ namespace ArcadeTerraria.Games.Game_of_Life
         {
             base.Update(gameTime);
 
-            UpdateInput();
+            UpdateInput2();
 
             if (playing && gameTimer % gameSpeed == 0)
             {
@@ -129,7 +129,7 @@ namespace ArcadeTerraria.Games.Game_of_Life
             return lives;
         }
 
-        private void UpdateInput()
+        private void UpdateInput2()
         {
             ToggleKeybind(Keys.Space, () => playing = !playing);
             ToggleKeybind(Keys.R, () => cells = new int[cells.GetLength(0), cells.GetLength(1)]);

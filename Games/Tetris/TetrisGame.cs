@@ -43,7 +43,7 @@ namespace ArcadeTerraria.Games.Tetris
 
             if (currentTetromino != null)
             {
-                UpdateInput();
+                UpdateInput2();
             }
 
             if (gameTimer % gameSpeed == 0)
@@ -79,7 +79,7 @@ namespace ArcadeTerraria.Games.Tetris
             }
         }
 
-        private void UpdateInput()
+        private void UpdateInput2()
         {
             if (!lastKeyboard.IsKeyDown(Keys.W) && Keyboard.IsKeyDown(Keys.W))
             {
