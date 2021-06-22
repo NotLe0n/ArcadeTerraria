@@ -38,8 +38,9 @@ namespace ArcadeTerraria.Games.Snake
         {
             if (lose)
             {
-                if (points >= 2)
+                if (points >= 20)
                 {
+                    rewardMultiplier = (float)System.Math.Sqrt(points);
                     WinGame();
                     return;
                 }

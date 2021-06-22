@@ -27,6 +27,13 @@ namespace ArcadeTerraria.Games.Minesweeper
             {
                 if (mine)
                 {
+                    if (MineSweeperGame.firstClick)
+                    {
+                        mine = false;
+                        Click();
+                        return;
+                    }
+
                     MineSweeperGame.lose = true;
                     revealed = true;
                 }
@@ -35,6 +42,8 @@ namespace ArcadeTerraria.Games.Minesweeper
                     revealed = true;
                     RevealNeighbors();
                 }
+
+                MineSweeperGame.firstClick = false;
             }
         }
 

@@ -18,6 +18,7 @@ namespace ArcadeTerraria.Games
         public int screenHeight;
         public int screenWidth;
         public Vector2 drawPosition;
+        public float rewardMultiplier = 1;
 
         // input stuff
         protected MouseState Mouse => Microsoft.Xna.Framework.Input.Mouse.GetState();

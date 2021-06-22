@@ -65,6 +65,7 @@ namespace ArcadeTerraria.Games.Breakout
             }
             if (points == blocks.GetLength(0) * blocks.GetLength(1))
             {
+                rewardMultiplier = (float)Math.Sqrt(points);
                 WinGame();
                 return;
             }

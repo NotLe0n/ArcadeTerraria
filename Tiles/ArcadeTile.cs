@@ -21,8 +21,8 @@ namespace ArcadeTerraria.Tiles
             Main.tileLavaDeath[Type] = true;
             Main.tileNoAttach[Type] = true;
             Main.tileFrameImportant[Type] = true;
-            TileObjectData.newTile.CopyFrom(TileObjectData.Style3x3);
-            TileObjectData.newTile.Width = 2;
+            TileObjectData.newTile.CopyFrom(TileObjectData.Style2xX);
+            TileObjectData.newTile.Height = 3;
             TileObjectData.addTile(Type);
 
             _game = Game;
@@ -42,7 +42,7 @@ namespace ArcadeTerraria.Tiles
         {
             for (int i = 0; i < 10; i++)
             {
-                Item.NewItem(position, new Vector2(10, 10), ItemID.SilverCoin, Main.rand.Next(0, 4));
+                Item.NewItem(position, new Vector2(10, 10), ItemID.SilverCoin, (int)(Main.rand.Next(0, 4) * Game.rewardMultiplier));
             }
         }
     }

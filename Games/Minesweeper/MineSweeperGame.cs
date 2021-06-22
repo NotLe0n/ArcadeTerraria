@@ -12,6 +12,7 @@ namespace ArcadeTerraria.Games.Minesweeper
 
         public static Cell[,] cells;
         public static bool lose;
+        public static bool firstClick;
         private int gameEndTimer;
 
         private bool MouseWithinBounds => Mouse.X > drawPosition.X && Mouse.Y > drawPosition.Y &&
@@ -28,6 +29,7 @@ namespace ArcadeTerraria.Games.Minesweeper
             gameEndTimer = 100;
             lose = false;
             cells = new Cell[15, 15];
+            firstClick = true;
 
             for (int x = 0; x < cells.GetLength(0); x++)
             {
@@ -51,6 +53,7 @@ namespace ArcadeTerraria.Games.Minesweeper
                 gameEndTimer--;
                 if (gameEndTimer <= 0)
                 {
+                    rewardMultiplier = NumMines / 2;
                     WinGame();
                     return;
                 }
