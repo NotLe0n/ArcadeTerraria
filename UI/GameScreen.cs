@@ -9,6 +9,7 @@ namespace ArcadeTerraria.UI
     class GameScreen : UIElement
     {
         public TerrariaGame game;
+        private RasterizerState _rasterizerState = new RasterizerState() { ScissorTestEnable = true };
 
         public GameScreen(TerrariaGame terrariaGame)
         {
@@ -17,8 +18,8 @@ namespace ArcadeTerraria.UI
 
         public override void OnInitialize()
         {
-            game.screenWidth = (int)GetDimensions().Width;
-            game.screenHeight = (int)GetDimensions().Height;
+            game.screenWidth = (int)Width.Pixels;
+            game.screenHeight = (int)Height.Pixels;
 
             game.Load();
         }
@@ -34,13 +35,20 @@ namespace ArcadeTerraria.UI
 
             spriteBatch.End();
 
-            var gameMatrix = Matrix.CreateScale(game.scale) * Matrix.CreateTranslation(new Vector3(game.drawPosition, 0));
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, gameMatrix);
+            var gameMatrix = Matrix.CreateScale(game.scale) * Matrix.CreateTranslation(new Vector3(game.drawPosition + new Vector2(2, 0), 0));
+            // Draw Game
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, _rasterizerState, null, gameMatrix);
+
+            Rectangle currentRect = spriteBatch.GraphicsDevice.ScissorRectangle;
+            spriteBatch.GraphicsDevice.ScissorRectangle = new Rectangle((int)game.drawPosition.X + 2, (int)game.drawPosition.Y, game.screenWidth + 3, game.screenHeight + 3);
 
             game.Draw(spriteBatch);
 
+            spriteBatch.GraphicsDevice.ScissorRectangle = currentRect;
+
             spriteBatch.End();
 
+            // Draw Text
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, Matrix.CreateTranslation(new Vector3(game.drawPosition, 0)));
 
             game.DrawText(spriteBatch);

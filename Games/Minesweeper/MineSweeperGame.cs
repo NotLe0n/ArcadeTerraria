@@ -28,7 +28,7 @@ namespace ArcadeTerraria.Games.Minesweeper
 
             gameEndTimer = 100;
             lose = false;
-            cells = new Cell[15, 15];
+            cells = new Cell[16, 15];
             firstClick = true;
 
             for (int x = 0; x < cells.GetLength(0); x++)
