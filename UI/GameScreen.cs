@@ -27,6 +27,9 @@ namespace ArcadeTerraria.UI
         {
             base.Draw(spriteBatch);
 
+            // set drawposition to the position of the UIPanel
+            game.drawPosition = GetDimensions().Position();
+
             spriteBatch.Draw(Main.magicPixel, new Rectangle((int)game.drawPosition.X, (int)game.drawPosition.Y, game.screenWidth, game.screenHeight), game.backgroundColor);
 
             spriteBatch.End();
@@ -34,7 +37,6 @@ namespace ArcadeTerraria.UI
             var gameMatrix = Matrix.CreateScale(game.scale) * Matrix.CreateTranslation(new Vector3(game.drawPosition, 0));
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, gameMatrix);
 
-            game.drawPosition = GetDimensions().Position();
             game.Draw(spriteBatch);
 
             spriteBatch.End();
